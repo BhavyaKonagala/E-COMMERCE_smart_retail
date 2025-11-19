@@ -34,8 +34,9 @@
     "vite": "^5.0.8"
   },
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
+  "dev": "vite",
+  "build": "vite build",
+  "vercel-build": "npm install --include=dev && npm run build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "format": "prettier --write \"src/**/*.{js,jsx,json,css,md}\""
