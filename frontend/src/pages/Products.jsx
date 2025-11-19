@@ -242,7 +242,7 @@ const Products = () => {
     };
 
     const handleQuantityChange = (newQuantity) => {
-      if (newQuantity >= 1 && newQuantity <= product.inventory.stock) {
+      if (newQuantity >= 1 && newQuantity <= (product.inventory?.stock ?? 0)) {
         setQuantity(newQuantity);
       }
     };
@@ -256,13 +256,13 @@ const Products = () => {
         >
           {product.images?.[0] ? (
             <img
-              src={product.images[0]}
+              src={product.images?.[0]}
               alt={product.name}
               className="h-48 w-full object-cover object-center group-hover:scale-105 transition-transform"
               onError={(e) => {
                 // Fallback to second image or placeholder
-                if (product.images?.[1] && e.target.src !== product.images[1]) {
-                  e.target.src = product.images[1];
+                if (product.images?.[1] && e.target.src !== product.images?.[1]) {
+                  e.target.src = product.images?.[1];
                 } else if (e.target.src !== 'https://via.placeholder.com/400x400?text=Product+Image') {
                   e.target.src = 'https://via.placeholder.com/400x400?text=Product+Image';
                 }
@@ -291,18 +291,18 @@ const Products = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <span className="text-lg font-bold text-qwipo-primary">
-                {formatCurrency(product.price.discountedPrice)}
+                {formatCurrency(product.price?.discountedPrice ?? product.price?.mrp ?? 0)}
               </span>
-              {product.price.mrp > product.price.discountedPrice && (
+              {(product.price?.mrp ?? 0) > (product.price?.discountedPrice ?? 0) && (
                 <span className="text-sm text-gray-500 line-through">
-                  {formatCurrency(product.price.mrp)}
+                  {formatCurrency(product.price?.mrp ?? product.price?.discountedPrice ?? 0)}
                 </span>
               )}
             </div>
 
-            {product.price.mrp > product.price.discountedPrice && (
+            {(product.price?.mrp ?? 0) > (product.price?.discountedPrice ?? 0) && (
               <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
-                {Math.round(((product.price.mrp - product.price.discountedPrice) / product.price.mrp) * 100)}% OFF
+                {Math.round((((product.price?.mrp ?? 0) - (product.price?.discountedPrice ?? 0)) / (product.price?.mrp ?? 1)) * 100)}% OFF
               </span>
             )}
           </div>
@@ -310,19 +310,19 @@ const Products = () => {
           {/* Stock and Rating */}
           <div className="flex items-center justify-between text-sm">
             <span className={`font-medium ${
-              product.inventory.stock > 0 ? 'text-green-600' : 'text-red-600'
+              (product.inventory?.stock ?? 0) > 0 ? 'text-green-600' : 'text-red-600'
             }`}>
-              {product.inventory.stock > 0 
-                ? `${product.inventory.stock} in stock` 
+              {(product.inventory?.stock ?? 0) > 0 
+                ? `${product.inventory?.stock ?? 0} in stock` 
                 : 'Out of stock'
               }
             </span>
 
-            {product.ratings.count > 0 && (
+            {(product.ratings?.count ?? 0) > 0 && (
               <div className="flex items-center">
                 <span className="text-yellow-400">★</span>
                 <span className="ml-1 text-gray-600">
-                  {product.ratings.average} ({product.ratings.count})
+                  {product.ratings?.average ?? 0} ({product.ratings?.count ?? 0})
                 </span>
               </div>
             )}
@@ -338,7 +338,7 @@ const Products = () => {
           )}
 
           {/* Quantity Selector */}
-          {product.inventory.stock > 0 && (
+          {(product.inventory?.stock ?? 0) > 0 && (
             <div className="flex items-center space-x-3">
               <span className="text-sm font-medium text-gray-700">Qty:</span>
               <div className="flex items-center space-x-2">
@@ -358,7 +358,7 @@ const Products = () => {
                   onChange={(e) => handleQuantityChange(parseInt(e.target.value) || 1)}
                   className="w-12 text-center border border-gray-300 rounded-md py-1 text-sm"
                   min="1"
-                  max={product.inventory.stock}
+                  max={product.inventory?.stock ?? 0}
                   onClick={(e) => e.stopPropagation()}
                 />
                 <button
@@ -367,7 +367,7 @@ const Products = () => {
                     handleQuantityChange(quantity + 1);
                   }}
                   className="w-8 h-8 flex items-center justify-center border border-gray-300 rounded-md hover:bg-gray-50"
-                  disabled={quantity >= product.inventory.stock}
+                  disabled={quantity >= (product.inventory?.stock ?? 0)}
                 >
                   <PlusIcon className="h-4 w-4" />
                 </button>
@@ -376,7 +376,7 @@ const Products = () => {
           )}
 
           {/* Action Buttons */}
-          {product.inventory.stock > 0 ? (
+          {(product.inventory?.stock ?? 0) > 0 ? (
             <div className="space-y-2">
               <button
                 onClick={handleAddToCart}
