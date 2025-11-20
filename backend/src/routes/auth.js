@@ -1,5 +1,6 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
+const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const Joi = require('joi');
 const User = require('../models/User');
@@ -32,6 +33,11 @@ const loginSchema = Joi.object({
 
 // Generate JWT Token
 const generateToken = (id) => {
+  if (!process.env.JWT_SECRET) {
+    // Explicitly throw a helpful error so logs are clearer
+    throw new Error('JWT_SECRET is not configured. Set JWT_SECRET in your environment.');
+  }
+
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRE || '7d',
   });
@@ -48,6 +54,12 @@ router.post('/register', async (req, res) => {
         success: false,
         message: error.details[0].message
       });
+    }
+
+    // Ensure DB is connected before attempting queries
+    if (mongoose.connection.readyState !== 1) {
+      logger.error('Register attempt when DB is not connected');
+      return res.status(503).json({ success: false, message: 'Database not connected' });
     }
 
     const { name, email, password, businessType, businessName, phone, businessAddress } = req.body;
@@ -111,6 +123,12 @@ router.post('/login', async (req, res) => {
         success: false,
         message: error.details[0].message
       });
+    }
+
+    // Ensure DB is connected before attempting queries
+    if (mongoose.connection.readyState !== 1) {
+      logger.error('Login attempt when DB is not connected');
+      return res.status(503).json({ success: false, message: 'Database not connected' });
     }
 
     const { email, password } = req.body;

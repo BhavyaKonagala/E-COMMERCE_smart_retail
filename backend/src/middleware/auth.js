@@ -19,6 +19,11 @@ const protect = async (req, res, next) => {
     }
 
     // Verify token
+    if (!process.env.JWT_SECRET) {
+      logger.error('JWT_SECRET not configured in environment');
+      return res.status(500).json({ success: false, message: 'Server configuration error: JWT_SECRET is not set' });
+    }
+
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     // Find user

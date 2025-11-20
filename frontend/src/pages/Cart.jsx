@@ -59,7 +59,7 @@ const Cart = () => {
     return () => { mounted = false; };
   }, [cart.items]);
 
-  if (cart.items.length === 0) {
+  if (!cart?.items || cart.items.length === 0) {
     return (
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -105,7 +105,7 @@ const Cart = () => {
           <div className="flex items-center space-x-4">
             <h1 className="text-2xl font-bold text-gray-900">Shopping Cart</h1>
             <span className="bg-qwipo-primary text-white px-3 py-1 rounded-full text-sm">
-              {cart.count} items
+              {cart?.count ?? 0} items
             </span>
           </div>
 
@@ -121,7 +121,7 @@ const Cart = () => {
           {/* Cart Items */}
           <div className="lg:col-span-2 space-y-4">
             {cart.items.map((item) => (
-              <div key={item._id} className="bg-white rounded-lg shadow-sm p-4">
+              <div key={item._id || item.id} className="bg-white rounded-lg shadow-sm p-4">
                 <div className="flex items-center gap-4">
                   {/* Product Image */}
                   <div className="w-28 h-28 bg-gray-100 rounded-md overflow-hidden flex-shrink-0 border">
@@ -140,15 +140,15 @@ const Cart = () => {
 
                   {/* Product Info */}
                   <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900 text-lg">{item.name}</h3>
-                    <p className="text-sm text-gray-500 mt-1">{item.brand} • {item.category}</p>
+                    <h3 className="font-semibold text-gray-900 text-lg">{item?.name || item.product?.name}</h3>
+                    <p className="text-sm text-gray-500 mt-1">{item?.brand || item.product?.brand} • {item?.category || item.product?.category}</p>
                     <div className="flex items-center space-x-3 mt-3">
                       <span className="text-xl font-bold text-qwipo-primary">
-                        {formatCurrency(item.price.discountedPrice)}
+                        {formatCurrency(item?.price?.discountedPrice ?? item?.price ?? 0)}
                       </span>
-                      {item.price.mrp > item.price.discountedPrice && (
+                      {(item?.price?.mrp ?? 0) > (item?.price?.discountedPrice ?? 0) && (
                         <span className="text-sm text-gray-400 line-through">
-                          {formatCurrency(item.price.mrp)}
+                          {formatCurrency(item?.price?.mrp ?? 0)}
                         </span>
                       )}
                     </div>
@@ -250,12 +250,12 @@ const Cart = () => {
                       </div>
                       <div className="text-right">
                         <div className="font-bold text-qwipo-primary">{formatCurrency(rec.product.price.discountedPrice)}</div>
-                        <button
-                          onClick={() => addToCart(rec.product, 1)}
-                          className="mt-2 btn-secondary text-sm"
-                        >
-                          Add
-                        </button>
+                          <button
+                            onClick={() => addToCart(rec.product ?? rec, 1)}
+                            className="mt-2 btn-secondary text-sm"
+                          >
+                            Add
+                          </button>
                       </div>
                     </div>
                   ))}

@@ -9,7 +9,11 @@ const orderSchema = new mongoose.Schema({
   orderNumber: {
     type: String,
     unique: true,
-    required: true
+    required: true,
+    default: function() {
+      // Use timestamp + random suffix to avoid needing a DB count during save
+      return `ORD${Date.now()}${Math.floor(Math.random() * 100000)}`;
+    }
   },
   items: [{
     productId: {
@@ -93,11 +97,8 @@ const orderSchema = new mongoose.Schema({
 });
 
 // Auto-generate order number
-orderSchema.pre('save', async function(next) {
-  if (!this.orderNumber) {
-    const count = await mongoose.model('Order').countDocuments();
-    this.orderNumber = `ORD${Date.now()}${count + 1}`;
-  }
+orderSchema.pre('save', function(next) {
+  // Ensure updatedAt is refreshed on each save. Default orderNumber is handled by the schema default.
   this.updatedAt = Date.now();
   next();
 });
