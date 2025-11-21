@@ -4,7 +4,7 @@ import requestManager from '../utils/requestManager';
 
 class ApiService {
   constructor() {
-    this.baseURL = '/api';
+    this.baseURL = import.meta.env.VITE_API_URL + '/api';
     this.token = localStorage.getItem('qwipo_token');
 
     // Create axios instance
