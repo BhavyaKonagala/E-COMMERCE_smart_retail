@@ -13,39 +13,36 @@ const logger = require('./utils/logger');
 const errorHandler = require('./middleware/errorHandler');
 const rateLimiter = require('./middleware/rateLimiter');
 
-// Import routes
-const authRoutes = require('./routes/auth');
-const productRoutes = require('./routes/products');
-const recommendationRoutes = require('./routes/recommendations');
-const userRoutes = require('./routes/users');
-const orderRoutes = require('./routes/orders');
-const analyticsRoutes = require('./routes/analytics');
-const aiAssistantRoutes = require('./routes/aiAssistant');
-const notificationRoutes = require('./routes/notifications');
-const businessInsightsRoutes = require('./routes/businessInsights');
-const userActivityRoutes = require('./routes/userActivity');
+// ------------------------------------------------------
+// ✅ ALLOWED FRONTEND ORIGINS (PUT AT TOP!)
+// ------------------------------------------------------
+const allowedOrigins = [
+  "http://localhost:3000",
+  "http://localhost:3001",
+  "http://localhost:3002",
+  "https://smartretailecommerceweb.netlify.app" // your deployed frontend
+];
 
+// ------------------------------------------------------
+// SERVER + SOCKET SETUP
+// ------------------------------------------------------
 const app = express();
 const server = http.createServer(app);
+
 const io = socketIo(server, {
   cors: {
     origin: allowedOrigins,
     methods: ["GET", "POST"],
     credentials: true
   },
-  transports: ['websocket', 'polling']
+  transports: ["websocket", "polling"]
 });
 
-
-// Middleware
+// ------------------------------------------------------
+// MIDDLEWARE
+// ------------------------------------------------------
 app.use(helmet());
 app.use(compression());
-const allowedOrigins = [
-  "http://localhost:3000",
-  "http://localhost:3001",
-  "http://localhost:3002",
-  "https://smartretailecommerceweb.netlify.app"
-];
 
 app.use(cors({
   origin: (origin, callback) => {
@@ -59,26 +56,24 @@ app.use(cors({
   credentials: true
 }));
 
-// Allow preflight requests for all routes
+// Allow preflight requests
 app.options("*", cors());
-
 
 app.use(morgan('combined', { stream: { write: message => logger.info(message.trim()) }}));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(express.static('public'));
-// Temporarily disable rate limiter for development
-// app.use(rateLimiter);
 
-// Store io instance for use in other modules
-app.set('io', io);
-
-// Database connection
+// ------------------------------------------------------
+// DATABASE
+// ------------------------------------------------------
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/smart-retail-recommendations')
-.then(() => logger.info('Connected to MongoDB'))
-.catch(err => logger.error('MongoDB connection error:', err));
+  .then(() => logger.info('Connected to MongoDB'))
+  .catch(err => logger.error('MongoDB connection error:', err));
 
-// Socket.io for real-time features
+// ------------------------------------------------------
+// SOCKET EVENTS
+// ------------------------------------------------------
 io.on('connection', (socket) => {
   logger.info('User connected:', socket.id);
 
@@ -92,7 +87,22 @@ io.on('connection', (socket) => {
   });
 });
 
-// Routes
+app.set('io', io);
+
+// ------------------------------------------------------
+// ROUTES
+// ------------------------------------------------------
+const authRoutes = require('./routes/auth');
+const productRoutes = require('./routes/products');
+const recommendationRoutes = require('./routes/recommendations');
+const userRoutes = require('./routes/users');
+const orderRoutes = require('./routes/orders');
+const analyticsRoutes = require('./routes/analytics');
+const aiAssistantRoutes = require('./routes/aiAssistant');
+const notificationRoutes = require('./routes/notifications');
+const businessInsightsRoutes = require('./routes/businessInsights');
+const userActivityRoutes = require('./routes/userActivity');
+
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/recommendations', recommendationRoutes);
@@ -104,7 +114,9 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/business-insights', businessInsightsRoutes);
 app.use('/api/activity', userActivityRoutes);
 
-// Health check endpoint
+// ------------------------------------------------------
+// HEALTH CHECK
+// ------------------------------------------------------
 app.get('/health', (req, res) => {
   res.status(200).json({
     status: 'OK',
@@ -113,28 +125,21 @@ app.get('/health', (req, res) => {
   });
 });
 
-// Cron jobs for automated tasks
-cron.schedule('0 */6 * * *', () => {
-  logger.info('Running ML model retraining...');
-  // TODO: Implement ML model retraining
-});
-
-cron.schedule('0 9 * * *', () => {
-  logger.info('Sending daily recommendation updates...');
-  // TODO: Implement daily recommendation emails
-});
-
-// Error handling middleware
+// ------------------------------------------------------
+// ERROR HANDLING
+// ------------------------------------------------------
 app.use(errorHandler);
 
-// 404 handler
 app.use('*', (req, res) => {
   res.status(404).json({ message: 'Route not found' });
 });
 
+// ------------------------------------------------------
+// START SERVER
+// ------------------------------------------------------
 const PORT = process.env.PORT || 5000;
-// Bind to 0.0.0.0 to ensure the server is reachable via IPv4 and from proxies
-const HOST = process.env.HOST || '0.0.0.0';
+const HOST = '0.0.0.0';
+
 server.listen(PORT, HOST, () => {
   logger.info(`Server running on ${HOST}:${PORT}`);
 });
