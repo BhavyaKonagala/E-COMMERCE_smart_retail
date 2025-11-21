@@ -29,31 +29,40 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: [
-      "http://localhost:3000",
-      "http://localhost:3001", 
-      "http://localhost:3002",
-      process.env.FRONTEND_URL
-    ].filter(Boolean),
+    origin: allowedOrigins,
     methods: ["GET", "POST"],
     credentials: true
   },
   transports: ['websocket', 'polling']
 });
 
+
 // Middleware
 app.use(helmet());
 app.use(compression());
+const allowedOrigins = [
+  "http://localhost:3000",
+  "http://localhost:3001",
+  "http://localhost:3002",
+  "https://smartretailecommerceweb.netlify.app",   // ⭐ Your frontend URL
+  process.env.FRONTEND_URL                        // ⭐ Deployed URL from env
+];
+
 app.use(cors({
-  origin: [
-    "http://localhost:3000",
-    "http://localhost:3001", 
-    "http://localhost:3002",
-    process.env.FRONTEND_URL
-  ].filter(Boolean),
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("❌ CORS Blocked: " + origin));
+    }
+  },
   credentials: true,
   optionsSuccessStatus: 200
 }));
+
+// 🔥 Enable preflight OPTIONS requests
+app.options("*", cors());
+
 app.use(morgan('combined', { stream: { write: message => logger.info(message.trim()) }}));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
