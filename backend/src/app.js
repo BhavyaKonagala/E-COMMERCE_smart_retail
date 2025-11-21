@@ -44,13 +44,19 @@ const allowedOrigins = [
   "http://localhost:3000",
   "http://localhost:3001",
   "http://localhost:3002",
-  "https://smartretailecommerceweb.netlify.app", // <-- your Netlify domain
-  process.env.FRONTEND_URL
-].filter(Boolean);
+  "https://smartretailecommerceweb.netlify.app"
+];
 
 app.use(cors({
-  origin: allowedOrigins,
-  credentials: true,
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.log("❌ BLOCKED ORIGIN:", origin);
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true
 }));
 
 // Allow preflight requests for all routes
