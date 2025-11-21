@@ -9,108 +9,64 @@ bower_components/
 
 # Puppeteer Chromium binaries
 .local-chromium/
-*/.local-chromium/
-chrome-win/
+**/.local-chromium/
 **/chrome-win/
-**/chrome.exe
 **/*.dll
+**/*.exe
+**/*.node
 
-# Dist / Build / Output
+# ╔════════════════════════════════╗
+# ║   BUILD / DIST / OUTPUT        ║
+# ╚════════════════════════════════╝
 dist/
 build/
-.cache
-.parcel-cache
-.next
-.nuxt
-.vuepress/dist
+frontend/dist/
+backend/dist/
+.cache/
+.parcel-cache/
+.vite/
+.next/
+.nuxt/
 .serverless/
 
-# Logs
+# ╔════════════════════════════════╗
+# ║   ENV FILES                    ║
+# ╚════════════════════════════════╝
+.env
+.env.*
+frontend/.env
+backend/.env
+
+# ╔════════════════════════════════╗
+# ║   LOGS                         ║
+# ╚════════════════════════════════╝
 logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Coverage
-coverage/
-*.lcov
-.nyc_output
-
-# Environment & config
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-.env.test.local
-
-# Editors & tooling
+# ╔════════════════════════════════╗
+# ║   EDITORS & OS FILES           ║
+# ╚════════════════════════════════╝
 .vscode/
 .idea/
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
 *.swp
-
-# OS files
 .DS_Store
 Thumbs.db
 ehthumbs.db
 .Trashes
 .Spotlight-V100
 
-# Yarn / NPM
-.yarn-integrity
-.npm
-*.tgz
+# ╔════════════════════════════════╗
+# ║   TEST / COVERAGE              ║
+# ╚════════════════════════════════╝
+coverage/
+.nyc_output/
+*.lcov
 
-# TypeScript
-typings/
-
-# Optional npm cache directory
-.npm
-
-# Optional eslint cache
-.eslintcache
-
-# Microbundle cache
-.rpt2_cache/
-.rts2_cache_cjs/
-.rts2_cache_es/
-.rts2_cache_umd/
-
-# Uploads (keep folder but ignore files)
+# ╔════════════════════════════════╗
+# ║   MISC                         ║
+# ╚════════════════════════════════╝
 uploads/*
 !uploads/.gitkeep
-
-# Others
-lib-cov
-.grunt
-.lock-wscript
-.fusebox/
-
-# DynamoDB Local files
-.dynamodb/
-
-# TernJS port file
-.tern-port
-
-# Uploads
-uploads/*
-!uploads/.gitkeep
-
-# Logs
-logs/*
-!logs/.gitkeep
-
-# OS generated files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-node_modules
