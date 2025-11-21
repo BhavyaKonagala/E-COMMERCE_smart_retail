@@ -1,4 +1,5 @@
 import React from 'react';
+import { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext';
@@ -27,6 +28,10 @@ import NotFound from './pages/NotFound';
 import Settings from './pages/Settings';
 
 function App() {
+  useEffect(() => {
+  console.log("🔍 API URL:", import.meta.env.VITE_API_URL);
+}, []);
+
   return (
     <AuthProvider>
       <SocketProvider>
