@@ -44,24 +44,18 @@ const allowedOrigins = [
   "http://localhost:3000",
   "http://localhost:3001",
   "http://localhost:3002",
-  "https://smartretailecommerceweb.netlify.app",   // ⭐ Your frontend URL
-  process.env.FRONTEND_URL                        // ⭐ Deployed URL from env
-];
+  "https://smartretailecommerceweb.netlify.app", // <-- your Netlify domain
+  process.env.FRONTEND_URL
+].filter(Boolean);
 
 app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("❌ CORS Blocked: " + origin));
-    }
-  },
+  origin: allowedOrigins,
   credentials: true,
-  optionsSuccessStatus: 200
 }));
 
-// 🔥 Enable preflight OPTIONS requests
+// Allow preflight requests for all routes
 app.options("*", cors());
+
 
 app.use(morgan('combined', { stream: { write: message => logger.info(message.trim()) }}));
 app.use(express.json({ limit: '50mb' }));
